@@ -19,16 +19,17 @@ import {
 	SelectOptionText,
 	SelectTrigger,
 	SelectValue,
+	SelectPlaceholder
 } from "@hope-ui/solid";
 import { For, createSignal, onMount } from "solid-js";
 import { AudioDeviceEvent , AudioDevice } from "@exolve/web-voice-sdk";
-
-
+import { $calls } from "../stores/calls.ts";
 
 export function BasedControls() {
 	const communicator = useStore($communicator);
 	const target = useStore($target);
 	const settings = useStore($settings);
+	const calls = useStore($calls);
 
 	const isSwitchEnv = ( Object.keys(environments).length > 0 );
 
@@ -53,8 +54,7 @@ export function BasedControls() {
 
 
 	onMount(async () => {
-		const audioDevices = await communicator().instance.client.getAudioDevices();
-		setAudioDevices(audioDevices);
+
 		setLoading(false);
 
 		communicator().instance.client.on( AudioDeviceEvent.Changed, (audioDevices: AudioDevice[]) => {
@@ -107,58 +107,58 @@ export function BasedControls() {
 						}</strong>
 					</>
 				)}
-				<br />
-					<Box css={{ "margin-top": "15px" }}>
-						Выберите микрофон:
-						<br/>
-						<Select
-							onChange={handleSelectAudioDevice}
-							disabled={loading()}
-							value={audioDevices().find(audioDevice => (audioDevice.isActive === true && audioDevice.type === "audioinput"))?.id}
-						>
-							<SelectTrigger>
-								<SelectValue />
-								<SelectIcon />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectListbox>
-									<For each={audioDevices().filter(audioDevice => audioDevice.type === "audioinput")}>
-										{(audioDevice) => 
-											<SelectOption value={audioDevice.id}>
-												<SelectOptionText>{audioDevice.name} {audioDevice.isActive}</SelectOptionText>
-											</SelectOption>
-										}
-									</For>
-								</SelectListbox>
-							</SelectContent>
-						</Select>
-					</Box>
-					<Box css={{ "margin-top": "15px" }}>
-						Выберите динамик:
-						<br/>
-						<Select
-							onChange={handleSelectAudioDevice}
-							disabled={loading()}
-							value={audioDevices().find(audioDevice => (audioDevice.isActive === true && audioDevice.type === "audiooutput"))?.id}
-						>
-							<SelectTrigger>
-								<SelectValue />
-								<SelectIcon />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectListbox>
-									<For each={audioDevices().filter(audioDevice => audioDevice.type === "audiooutput")}>
-										{(audioDevice) => 
-											<SelectOption value={audioDevice.id}>
-												<SelectOptionText>{audioDevice.name} {audioDevice.isActive}</SelectOptionText>
-											</SelectOption>
-										}
-									</For>
-								</SelectListbox>
-							</SelectContent>
-						</Select>
-					</Box>
-				<br />
+				{calls().length > 0 && (
+					<>
+						<br />
+						<Box css={{ "margin-top": "15px" }}>
+							<Select
+								onChange={handleSelectAudioDevice}
+								disabled={loading()}
+							>
+								<SelectTrigger>
+									<SelectPlaceholder>Выберите микрофон</SelectPlaceholder>
+									<SelectValue />
+									<SelectIcon />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectListbox>
+										<For each={audioDevices().filter(audioDevice => audioDevice.type === "audioinput")}>
+											{(audioDevice) =>
+												<SelectOption value={audioDevice.id}>
+													<SelectOptionText>{audioDevice.name}</SelectOptionText>
+												</SelectOption>
+											}
+										</For>
+									</SelectListbox>
+								</SelectContent>
+							</Select>
+						</Box>
+						<Box css={{ "margin-top": "15px" }}>
+							<Select
+								onChange={handleSelectAudioDevice}
+								disabled={loading()}
+							>
+								<SelectTrigger>
+									<SelectPlaceholder>Выберите динамик</SelectPlaceholder>
+									<SelectValue />
+									<SelectIcon />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectListbox>
+										<For each={audioDevices().filter(audioDevice => audioDevice.type === "audiooutput")}>
+											{(audioDevice) =>
+												<SelectOption value={audioDevice.id}>
+													<SelectOptionText>{audioDevice.name}</SelectOptionText>
+												</SelectOption>
+											}
+										</For>
+									</SelectListbox>
+								</SelectContent>
+							</Select>
+						</Box>
+						<br />
+					</>
+				)}
 			</Box>
 			<Button
 				onClick={resetSettings}
