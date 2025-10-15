@@ -15,7 +15,7 @@
 	},
 	"dependencies": {
 		"@hope-ui/solid": "^0.6.7",
-		"@exolve/web-voice-sdk": "1.2.3",
+		"@exolve/web-voice-sdk": "1.2.4",
 		"@nanostores/solid": "^0.4.2",
 		"@stitches/core": "^1.2.8",
 		"nanostores": "^0.9.4",
