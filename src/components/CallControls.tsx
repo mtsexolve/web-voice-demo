@@ -8,7 +8,8 @@ import {
     ModalContent,
     ModalHeader,
     ModalBody,
-    ModalFooter
+    ModalFooter,
+    Text
 } from "@hope-ui/solid";
 import {
 	CallItem,
@@ -19,7 +20,6 @@ import { formatPhoneNumber, formatSeconds } from "../utils/format.ts";
 import { $attendedTransferCallID } from "../stores/attendedTransfer.ts";
 import { CallDirection, CallState } from "@exolve/web-voice-sdk";
 import { useStore } from "@nanostores/solid";
-
 
 
 const directionTranslate = {
@@ -220,6 +220,15 @@ export function CallControls(props: { callItem: CallItem }) {
 			});
 		});	
 	};
+
+	const handleCopyToClipboard = () => {
+    	navigator.clipboard.writeText(props.callItem.extraContext ?? "");
+		notificationService.show({
+			title: "Дополнительный контекст скопирован в буфер обмена",
+			status: "success",
+			duration: 1500,
+		});
+	};
 	
 	return (
 		<Box css={{ padding: "16px", borderRadius: "8px", backgroundColor: "$neutral2", display: "flex", gap: 2, flexDirection: "row", justifyContent: "space-between"}}>
@@ -228,6 +237,25 @@ export function CallControls(props: { callItem: CallItem }) {
 				<Box>{directionTranslate[props.callItem.call.direction]}</Box>
 				<Box css={{ fontSize: "0.8em" }}>{callStateTranslate[props.callItem.state]}</Box>
 				<Box css={{ fontSize: "0.8em" }}>Длительность: {formatSeconds(props.callItem.duration)}</Box>
+				{props.callItem.extraContext !== undefined && (
+					<Box css={{ fontSize: "0.8em" }}>Дополнительный контекст:
+						<Text
+							as="span"
+							cursor="pointer"
+							onClick={handleCopyToClipboard}
+							_hover={{ color: "$primary9" }}
+							style={{
+								"white-space" : "nowrap",
+								"text-overflow" : "ellipsis",
+								"overflow" : "hidden",
+								"display" : "block",
+								"max-width" : "200px"
+							}}
+						>
+							{props.callItem.extraContext}
+						</Text>
+					</Box>
+				)}
 			</Box>
 			<Box css={{ display: "flex", flex: 1 ,gap: 12, alignItems: "center", flexDirection: "column" }}>
 				{isIncoming() && isProgressState() && (

@@ -8,6 +8,7 @@ export type CallItem = {
 	duration: number;
 	call: Call;
 	durationUpdater?: NodeJS.Timeout;
+	extraContext?: string;
 };
 
 export const $calls = map<CallItem[]>([]);
@@ -73,6 +74,7 @@ const setCall = action($calls, "setCall", (_ , call: Call) => {
 			state: call.state,
 			duration: 0,
 			call: call,
+			extraContext: call.extraContext
 		};
 
 		push(callItem);

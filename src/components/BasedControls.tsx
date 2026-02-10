@@ -1,8 +1,9 @@
 import { FiPhone } from "solid-icons/fi";
+import { AiOutlineInfoCircle } from "solid-icons/ai";
 import { $settings, resetSettings } from "../stores/settings.ts";
 import { useStore } from "@nanostores/solid";
 import { $communicator, register, unregister } from "../stores/communicator.ts";
-import { $target } from "../stores/target.ts";
+import { $target, $extraContext } from "../stores/controls.ts";
 import { environments } from "@environments";
 import {
 	Badge,
@@ -28,6 +29,7 @@ import { $calls } from "../stores/calls.ts";
 export function BasedControls() {
 	const communicator = useStore($communicator);
 	const target = useStore($target);
+	const extraContext = useStore($extraContext);
 	const settings = useStore($settings);
 	const calls = useStore($calls);
 
@@ -39,7 +41,8 @@ export function BasedControls() {
 
 	const handleStartCall = async () => {
 		if (!communicator().registered) register();
-		communicator().instance.client.makeCall($target.get());
+		const extraContext = $extraContext.get();
+		communicator().instance.client.makeCall($target.get(), (extraContext.length > 0 ) ? extraContext : undefined);
 	};
 
 	const [audioDevices, setAudioDevices] = createSignal<AudioDevice[]>([]);
@@ -84,6 +87,19 @@ export function BasedControls() {
 						value={target()}
 						onInput={e => $target.set(e.currentTarget.value)}
 						placeholder="Номер телефона"
+					/>
+				</InputGroup>
+				<InputGroup
+					css={{ "margin-top": "12px" }}
+				>
+					<InputLeftElement pointerEvents="none" color="$neutral9">
+						<AiOutlineInfoCircle  />
+					</InputLeftElement>
+					<Input
+						value={extraContext()}
+						onInput={e => $extraContext.set(e.currentTarget.value)}
+						maxLength={50}
+						placeholder="Дополнительный контекст (опционально)"
 					/>
 				</InputGroup>
 				<Button
